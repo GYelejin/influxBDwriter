@@ -17,16 +17,28 @@ with open("appsettings.json", "r") as read_file:
     config = json.load(read_file)
 
 def get_topic():
-    topics = []
-    for device in config["ProgramConfiguration"]["Devices"]:
-        topics.append(("/".join([config["MqttConfiguration"]["MqttHomeDeviceTopic"], config["ProgramConfiguration"]["ServiceName"], "HassAnalogSensor" if device["DeviceDescription"]["DeviceType"] != "Plug" else "HassBinarySensor", device["DeviceDescription"]["Identifier"]]), 0))
-    return topics
+    return [
+        (
+            "/".join(
+                [
+                    config["MqttConfiguration"]["MqttHomeDeviceTopic"],
+                    config["ProgramConfiguration"]["ServiceName"],
+                    "HassAnalogSensor"
+                    if device["DeviceDescription"]["DeviceType"] != "Plug"
+                    else "HassBinarySensor",
+                    device["DeviceDescription"]["Identifier"],
+                ]
+            ),
+            0,
+        )
+        for device in config["ProgramConfiguration"]["Devices"]
+    ]
 
 def get_device_types():
-    data = []
-    for device in config["ProgramConfiguration"]["Devices"]:
-        data.append(device["DeviceDescription"]["DeviceType"])
-    return data
+    return [
+        device["DeviceDescription"]["DeviceType"]
+        for device in config["ProgramConfiguration"]["Devices"]
+    ]
 
 def get_data_type_aliaes(sensor_id):
     return type_name[data_id_type[int(sensor_id)-1]]
